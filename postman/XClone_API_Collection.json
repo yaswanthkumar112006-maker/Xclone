@@ -1,0 +1,104 @@
+{
+  "info": {
+    "_postman_id": "xclone-api-v1-collection",
+    "name": "XClone REST API",
+    "description": "Postman collection for testing XClone modular monolith backend endpoints.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Get Service Health",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/health",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "health"
+              ]
+            },
+            "description": "Returns operational status and metadata of the XClone backend application."
+          },
+          "response": [
+            {
+              "name": "Health Status 200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/health",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "health"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"XClone backend service is running\",\n  \"data\": {\n    \"status\": \"UP\",\n    \"service\": \"xclone-backend\",\n    \"version\": \"0.0.1-SNAPSHOT\",\n    \"serverTime\": \"2026-09-23T00:15:00.000Z\"\n  },\n  \"timestamp\": \"2026-09-23T00:15:00.000Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Spring Actuator Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/actuator/health",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "actuator",
+                "health"
+              ]
+            },
+            "description": "Built-in Spring Boot Actuator health endpoint."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Auth (Planned)",
+      "item": [],
+      "description": "Authentication endpoints: Register, Login, Refresh Token, Logout (Planned for Stage 2)"
+    },
+    {
+      "name": "Users (Planned)",
+      "item": [],
+      "description": "User profile & settings endpoints (Planned for upcoming stages)"
+    },
+    {
+      "name": "Posts & Tweets (Planned)",
+      "item": [],
+      "description": "Post creation, feed, like, bookmark endpoints (Planned for upcoming stages)"
+    }
+  ]
+}
