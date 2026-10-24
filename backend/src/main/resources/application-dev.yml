@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:xclone_db}
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5433}/${DB_NAME:xclone_db}
     username: ${DB_USERNAME:xclone_user}
     password: ${DB_PASSWORD:xclone_password}
     driver-class-name: org.postgresql.Driver
