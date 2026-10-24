@@ -9,8 +9,11 @@ spring:
     hibernate:
       ddl-auto: create-drop
     show-sql: false
+  flyway:
+    enabled: false
   data:
     redis:
+      enabled: false
       host: localhost
       port: 6379
 

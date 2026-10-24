@@ -1,205 +1,339 @@
-# XClone
+# 🕊️ XClone — Full-Stack Twitter/X Social Media Platform
 
-A serious, production-grade, real-time social media platform inspired by X (formerly Twitter), built with a **modular monolith architecture** using **Java 21**, **Spring Boot 3.4+**, **PostgreSQL**, **Redis**, and **React**.
-
----
-
-## 📌 Main Objective
-
-The primary objective of this project is to build an enterprise-quality social media backend from the ground up to deeply master:
-- Modern Spring Boot backend engineering & clean code patterns.
-- Relational database schema design, indexing, and transactional boundaries.
-- Redis caching strategies and real-time STOMP/WebSocket communication.
-- Strict API design principles with standard response envelopes and global error handling.
-- Step-by-step feature development where every endpoint is rigorously tested in Postman before frontend integration.
+A complete, production-grade social media web application inspired by X (formerly Twitter), engineered as a **modular monolith** with **Java 21**, **Spring Boot 3.4**, **Spring Security (stateless JWT)**, **PostgreSQL 17**, **Flyway**, **React 19**, **TypeScript**, and **Tailwind CSS**.
 
 ---
 
-## 🚦 Project Status
-
-To ensure complete transparency and maintainability, feature progress is strictly tracked:
-
-### ✅ Completed
-- [x] Project architecture & repository initialization
-- [x] Java 21 & Spring Boot 3.4.x Maven configuration
-- [x] Modular package layout (`com.xclone.*`)
-- [x] Application profile configurations (`dev`, `prod`, `test`)
-- [x] PostgreSQL & Redis Docker Compose infrastructure
-- [x] Global Exception Handling & standard response DTOs (`ApiResponse`, `ErrorResponse`, `ValidationError`)
-- [x] Web CORS configuration for frontend clients
-- [x] Redis template serializer configuration
-- [x] Health check endpoints (`/api/v1/health` and `/actuator/health`)
-- [x] Unit and slice test suite with MockMvc and H2 in-memory test database
-- [x] Postman environment and collection setup
-
-### 🚧 In Progress
-- [ ] *None (Foundation Stage Complete — ready for Stage 2: Authentication & User Domain)*
-
-### 📋 Planned (Step-by-Step Roadmap)
-- [ ] **Stage 2**: User Domain & Authentication (Registration, Password Hashing with BCrypt, JWT Access/Refresh tokens)
-- [ ] **Stage 3**: User Profiles & Account Management (Bio, Avatars, Handles, Profile updates)
-- [ ] **Stage 4**: Post Creation & Media Engine (Tweets, Threads, Cloudinary/S3 image uploads)
-- [ ] **Stage 5**: Social Graph & Interactions (Follow/Unfollow, Likes, Bookmarks, Retweets/Quotes)
-- [ ] **Stage 6**: Comments & Nested Discussions (Reply trees, pagination)
-- [ ] **Stage 7**: Feed Generation & Caching (Chronological 'Following' feed, Redis fan-out / timeline caching)
-- [ ] **Stage 8**: Real-time Notifications & STOMP WebSockets (Likes, mentions, follows)
-- [ ] **Stage 9**: Direct Messaging / Real-Time Chat (1-on-1 private messaging via WebSocket & Redis Pub/Sub)
-- [ ] **Stage 10**: Search & Discovery (Hashtag indexing, user discovery)
-- [ ] **Stage 11**: Frontend Single Page App (React + TypeScript + Vite + TanStack Query)
+## 📑 Table of Contents
+1. [Project Overview](#-project-overview)
+2. [Key Features](#-key-features)
+3. [System Architecture](#-system-architecture)
+4. [Database Design & ER Diagram](#-database-design--er-diagram)
+5. [Tech Stack](#-tech-stack)
+6. [API Documentation & Examples](#-api-documentation--examples)
+7. [Getting Started & Local Setup](#-getting-started--local-setup)
+   - [Prerequisites](#prerequisites)
+   - [Database Setup](#1-database-setup)
+   - [Backend Setup](#2-backend-setup)
+   - [Frontend Setup](#3-frontend-setup)
+8. [Automated Testing & Verification](#-automated-testing--verification)
+9. [Security Implementation](#-security-implementation)
+10. [Known Limitations & Future Roadmap](#-known-limitations--future-roadmap)
 
 ---
 
-## 🛠 Technology Stack
+## 🌟 Project Overview
 
-### Backend
-- **Language**: Java 21 (LTS)
-- **Framework**: Spring Boot 3.4.x
-- **Web Layer**: Spring Web (RESTful APIs)
-- **Persistence**: Spring Data JPA & Hibernate
-- **Validation**: Jakarta Bean Validation (`spring-boot-starter-validation`)
-- **Security**: Spring Security & JWT (Planned)
-- **Real-Time**: Spring WebSocket with STOMP protocol (Planned)
-- **Observability**: Spring Boot Actuator
-
-### Database & Caching
-- **Primary Database**: PostgreSQL 16
-- **Caching & Pub/Sub**: Redis 7
-
-### Testing Suite
-- **Unit & Slice Tests**: JUnit 5, Mockito, Spring Boot Test (`@WebMvcTest`)
-- **In-Memory Testing DB**: H2 Database
-- **Integration Tests**: Testcontainers (Planned)
-
-### Frontend (Upcoming)
-- React, TypeScript, Vite, React Router, Axios, TanStack Query
-
-### DevOps & Tooling
-- Git & GitHub
-- Docker & Docker Compose
-- Postman (API Testing & Verification)
-
-### Media & Storage
-- Cloudinary / S3-compatible Object Storage (Planned)
-
-> **Note on Architecture Evolution**: Kafka, Kubernetes, Elasticsearch, and microservices decomposition are intentionally omitted at this stage. They will only be introduced when scaling requirements justify the engineering complexity.
+**XClone** is built for software engineering portfolio evaluation and technical interviews. It is designed around clean software engineering principles:
+- **Clean Architecture**: Controller-Service-Repository separation of concerns without business logic leakage.
+- **Strict Zero-Lombok Compliance**: Explicit constructors, getters, setters, and entity lifecycle hooks for maximum clarity and debuggability.
+- **Server-Side Identity Verification**: Authenticated identity is securely derived strictly from the Spring SecurityContext / JWT Principal—never trusting client-supplied author IDs.
+- **Normalized Relational Schema**: 3NF relational design with database-level uniqueness constraints and cascading referential integrity.
+- **Modern Responsive UI**: Custom dark-mode UI styled with Tailwind CSS, responsive 3-column desktop layout, mobile drawer navigation, live search, optimistic like updates, and threaded discussions.
 
 ---
 
-## 🏗 Architecture & Package Structure
+## 🚀 Key Features
 
-The backend follows a clean **Modular Monolith** architecture with clear separation of concerns:
+### 🔐 Authentication & Accounts
+- **User Registration & Login**: Validated inputs with BCrypt password hashing.
+- **Stateless JWT Security**: HMAC-SHA256 tokens using modern JJWT 0.12.x.
+- **User Profiles**: Custom display names, handles, avatars, header banners, bios, locations, and website links.
+- **Account Self-Management**: In-app modal to update profile metadata in real-time.
 
+### 📝 Posts & Threaded Conversations
+- **Post Composer**: 280-character limit with dynamic circular progress indicators and hotkey support (`Ctrl` / `Cmd` + `Enter`).
+- **Threaded Replies**: Native replies with hierarchical parent-child references.
+- **Post Ownership Enforcement**: Strict backend authorization forbidding non-owners from editing or deleting tweets.
+- **Optimistic Interactions**: Instant like/unlike response with synchronized counter states.
+
+### 👥 Social Graph & Feeds
+- **Follow / Unfollow System**: Normalized follow graph preventing duplicate links or self-following.
+- **Personalized Home Timeline ("Following")**: Feed curated strictly from accounts followed by the user + the author's own posts, ordered newest-first.
+- **Global Explore Feed ("For You")**: Discover public posts across the entire community.
+- **User Profile Timelines**: Tabbed views for user's tweets and liked posts.
+
+### 🔍 Discovery & Live Search
+- **Instant Search**: Real-time debounced query search for finding both users and tweet content.
+- **Quick-Follow Cards**: "Who to follow" recommendations with real one-click follow toggles.
+
+---
+
+## 🏛️ System Architecture
+
+```mermaid
+graph TD
+    Client["React 19 + TypeScript + Tailwind CSS (Vite @ :5173)"]
+    APIClient["Axios API Client (JWT Interceptor)"]
+    SpringSec["Spring Security Filter Chain (JwtAuthenticationFilter)"]
+    Controllers["REST Controllers (/api/v1/*)"]
+    Services["Business Service Layer"]
+    Repos["Spring Data JPA Repositories"]
+    DB[(PostgreSQL 16/17 Database)]
+    Flyway["Flyway Migration Engine"]
+
+    Client --> APIClient
+    APIClient -->|HTTP + Bearer Token| SpringSec
+    SpringSec --> Controllers
+    Controllers --> Services
+    Services --> Repos
+    Repos --> DB
+    Flyway -->|Auto-migrates V1 schema| DB
 ```
-twit/
-├── .env.example                     # Environment variables template
-├── .gitignore                       # Git ignore definitions
-├── docker-compose.yml               # PostgreSQL & Redis container stack
-├── README.md                        # Project documentation
-├── postman/                         # API testing collections
-│   ├── XClone_API_Collection.json
-│   └── XClone_Environment.json
-└── backend/
-    ├── pom.xml                      # Maven build descriptor
-    └── src/
-        ├── main/
-        │   ├── java/com/xclone/
-        │   │   ├── XCloneApplication.java
-        │   │   ├── auth/            # Auth, JWT, Login, Register (Planned)
-        │   │   ├── user/            # User entity & account management (Planned)
-        │   │   ├── profile/         # User profile & avatar (Planned)
-        │   │   ├── post/            # Posts, Tweets, Retweets (Planned)
-        │   │   ├── comment/         # Comments & replies (Planned)
-        │   │   ├── like/            # Likes on posts (Planned)
-        │   │   ├── follow/          # Follower/Following graph (Planned)
-        │   │   ├── bookmark/        # Saved tweets (Planned)
-        │   │   ├── feed/            # Timeline & feed generation (Planned)
-        │   │   ├── notification/    # Notifications & alerts (Planned)
-        │   │   ├── chat/            # 1-on-1 Direct messages (Planned)
-        │   │   ├── search/          # Search & discovery (Planned)
-        │   │   ├── media/           # Cloudinary/S3 media uploads (Planned)
-        │   │   ├── websocket/       # STOMP real-time handlers (Planned)
-        │   │   ├── security/        # Security config & filters (Planned)
-        │   │   ├── config/          # CORS, Redis, WebMvc configuration
-        │   │   ├── common/          # Shared DTOs, Exceptions & Handlers
-        │   │   │   ├── dto/         # ApiResponse, ErrorResponse, ValidationError
-        │   │   │   └── exception/   # AppException, ResourceNotFoundException, GlobalExceptionHandler
-        │   │   └── health/          # Health check endpoint controller
-        │   └── resources/
-        │       ├── application.yml
-        │       ├── application-dev.yml
-        │       └── application-prod.yml
-        └── test/
-            ├── java/com/xclone/
-            │   ├── common/exception/GlobalExceptionHandlerTest.java
-            │   └── health/HealthControllerTest.java
-            └── resources/
-                └── application-test.yml
+
+### Backend Directory Layout
+```
+backend/src/main/java/com/xclone/
+├── XCloneApplication.java
+├── common/             # Global envelopes, exception advice, validation models
+├── config/             # CORS registry, Redis conditional beans, WebMvc
+├── security/           # JWT provider, UserPrincipal, auth filter, SecurityFilterChain
+├── auth/               # Register, login, me endpoints & AuthService
+├── user/               # User entity, repository, profile update, user search
+├── post/               # Post entity, repository, thread replies, ownership checks
+├── like/               # Like entity, unique constraints, toggle like service
+├── follow/             # Follow entity, follower/following counts, graph service
+├── feed/               # Chronological timeline algorithms (Home vs Explore)
+└── search/             # Multi-entity search service (users & post text)
 ```
 
 ---
 
-## 🧪 API Verification via Postman
+## 🗄️ Database Design & ER Diagram
 
-As part of our strict **Backend-First Philosophy**, every API endpoint must be designed, documented, implemented, and verified in **Postman** before any frontend UI integration begins.
+The database schema is managed declaratively via Flyway migrations located in `backend/src/main/resources/db/migration/V1__init_schema.sql`.
 
-### Postman Setup:
-1. Import `postman/XClone_API_Collection.json` into Postman.
-2. Import `postman/XClone_Environment.json` and select the **XClone - Local Dev** environment.
-3. Test the initial endpoint:
-   - `GET {{baseUrl}}/api/v1/health`
-4. Expected 200 OK Response:
+### Relational Schema Diagram
+```mermaid
+erDiagram
+    USERS ||--o{ POSTS : creates
+    USERS ||--o{ LIKES : gives
+    USERS ||--o{ FOLLOWS : follows
+    USERS ||--o{ FOLLOWS : followed_by
+    POSTS ||--o{ LIKES : receives
+    POSTS ||--o{ POSTS : replies_to
+
+    USERS {
+        bigserial id PK
+        varchar(50) username UK
+        varchar(100) email UK
+        varchar(255) password
+        varchar(100) display_name
+        varchar(280) bio
+        varchar(500) avatar_url
+        varchar(500) header_url
+        varchar(100) location
+        varchar(200) website
+        timestamptz created_at
+        timestamptz updated_at
+    }
+
+    POSTS {
+        bigserial id PK
+        bigint user_id FK
+        varchar(280) content
+        bigint parent_post_id FK
+        timestamptz created_at
+        timestamptz updated_at
+    }
+
+    FOLLOWS {
+        bigserial id PK
+        bigint follower_id FK
+        bigint following_id FK
+        timestamptz created_at
+    }
+
+    LIKES {
+        bigserial id PK
+        bigint user_id FK
+        bigint post_id FK
+        timestamptz created_at
+    }
+```
+
+### Key Schema Constraints
+- **Uniqueness**: `uk_users_username` on `users(username)`, `uk_users_email` on `users(email)`.
+- **Duplicate Prevention**: `uk_follows_pair` on `follows(follower_id, following_id)` and `uk_likes_user_post` on `likes(user_id, post_id)`.
+- **Integrity**: `chk_follows_no_self_follow` enforces `follower_id <> following_id`.
+- **Cascade Deletion**: All child records (likes, replies, follows) cascade-delete automatically upon entity removal.
+- **Performance Indexes**: B-tree indexes on `posts(created_at DESC)`, `posts(user_id)`, `follows(follower_id)`, `follows(following_id)`.
+
+---
+
+## 💻 Tech Stack
+
+| Domain | Technology | Purpose |
+|---|---|---|
+| **Backend Framework** | Spring Boot 3.4.3 | REST API and Monolith Backend |
+| **Language** | Java 21 LTS | Core backend business logic |
+| **Security** | Spring Security 6 & JJWT 0.12.6 | Stateless JWT authorization & BCrypt hashing |
+| **ORM / Data** | Spring Data JPA / Hibernate | Relational persistence & query generation |
+| **Migrations** | Flyway | Versioned database migrations |
+| **Primary DB** | PostgreSQL 16/17 | Production relational data store |
+| **Test DB** | H2 In-Memory Database | Fast, isolated test suite execution |
+| **Frontend Framework** | React 19 + TypeScript | Component-based single-page web app |
+| **Bundler & Tooling**| Vite | Fast ESM development & optimized production build |
+| **Styling** | Tailwind CSS 3.4 | Consistent modern dark-mode design system |
+| **Icons & Utils** | Lucide React & Date-fns | Iconography and relative time formatters |
+| **HTTP Client** | Axios | Intercepted API calls with automatic Bearer token injection |
+
+---
+
+## 📡 API Documentation & Examples
+
+All API responses follow a standardized JSON envelope:
 ```json
 {
   "success": true,
-  "message": "XClone backend service is running",
-  "data": {
-    "status": "UP",
-    "service": "xclone-backend",
-    "version": "0.0.1-SNAPSHOT",
-    "serverTime": "2026-09-23T07:18:01.000Z"
-  },
-  "timestamp": "2026-09-23T07:18:01.000Z"
+  "message": "Operation description",
+  "data": { ... },
+  "timestamp": "2026-10-24T13:45:00.000Z"
 }
 ```
 
+### Core Endpoints
+
+#### 1. Authentication
+- `POST /api/v1/auth/register` — Register a new account.
+- `POST /api/v1/auth/login` — Authenticate and receive a JWT Bearer token.
+- `GET /api/v1/auth/me` — Retrieve the currently authenticated user session.
+
+#### 2. Posts & Replies
+- `GET /api/v1/feed/home?page=0&size=20` — Chronological feed from followed users (Requires auth).
+- `GET /api/v1/feed/explore?page=0&size=20` — Public explore timeline (Public).
+- `POST /api/v1/posts` — Create a new top-level tweet or threaded reply.
+  ```json
+  {
+    "content": "Exploring Java 21 and Spring Boot 3 with modern React!",
+    "parentPostId": null
+  }
+  ```
+- `GET /api/v1/posts/{id}` — Retrieve post and author details.
+- `PUT /api/v1/posts/{id}` — Edit post content (owner only).
+- `DELETE /api/v1/posts/{id}` — Delete post and cascade replies (owner only).
+- `GET /api/v1/posts/{id}/replies` — Retrieve threaded comments.
+
+#### 3. Social Interactions
+- `POST /api/v1/posts/{id}/like` — Like a post.
+- `DELETE /api/v1/posts/{id}/like` — Unlike a post.
+- `POST /api/v1/users/{username}/follow` — Follow a user.
+- `DELETE /api/v1/users/{username}/follow` — Unfollow a user.
+
+#### 4. Profiles & Search
+- `GET /api/v1/users/{username}` — Public profile metadata with follower/following counts.
+- `PUT /api/v1/users/profile` — Update bio, location, website, avatar, banner.
+- `GET /api/v1/search/users?q=keyword` — Search users by name or handle.
+- `GET /api/v1/search/posts?q=keyword` — Search posts by text content.
+
 ---
 
-## 🚀 Running the Project Locally
+## 🛠️ Getting Started & Local Setup
 
 ### Prerequisites
-- **Java 21** installed (`java -version`)
-- **Apache Maven 3.9+** installed (`mvn -version`)
-- **Docker & Docker Compose** (for running PostgreSQL & Redis locally)
-
-### 1. Configure Environment Variables
-Copy the example environment file:
-```bash
-cp .env.example .env
-```
-
-### 2. Start PostgreSQL and Redis
-```bash
-docker compose up -d
-```
-
-### 3. Run Backend Tests
-```bash
-cd backend
-mvn clean test
-```
-
-### 4. Start the Backend Application
-```bash
-cd backend
-mvn spring-boot:run
-```
-
-The application will start on `http://localhost:8080`.
+- **Java 21 LTS** (`java -version`)
+- **Maven 3.9+** (`mvn -v`)
+- **Node.js 18+ & npm 9+** (`node -v`)
+- **PostgreSQL 16/17** (or Docker)
 
 ---
 
-## 🔮 Future Enhancements & Scaling
-- **Distributed Caching**: Redis cluster for global caching.
-- **Message Queues**: Apache Kafka for asynchronous fan-out timeline workers.
-- **Full-Text Search**: Elasticsearch / OpenSearch for high-throughput tweet & user search.
-- **Container Orchestration**: Kubernetes deployment manifests.
+### 1. Database Setup
+
+#### Option A: Local PostgreSQL Service
+Create the database and developer user using `psql`:
+```sql
+CREATE DATABASE xclone_db;
+CREATE USER xclone_user WITH ENCRYPTED PASSWORD 'xclone_password';
+GRANT ALL PRIVILEGES ON DATABASE xclone_db TO xclone_user;
+```
+
+#### Option B: Docker Compose
+```bash
+docker compose up -d postgres
+```
+
+---
+
+### 2. Backend Setup
+1. Copy the environment variables:
+   ```bash
+   cp .env.example .env
+   ```
+2. Build and run automated tests:
+   ```bash
+   cd backend
+   mvn clean test
+   ```
+3. Start the Spring Boot backend:
+   ```bash
+   mvn spring-boot:run
+   ```
+   The backend will start at `http://localhost:8080`. Flyway will automatically execute `V1__init_schema.sql` on startup.
+
+---
+
+### 3. Frontend Setup
+1. Install dependencies:
+   ```bash
+   cd frontend
+   npm install
+   ```
+2. Run the Vite development server:
+   ```bash
+   npm run dev
+   ```
+   The application will be accessible at `http://localhost:5173`.
+
+---
+
+## 🧪 Automated Testing & Verification
+
+The project includes unit, mock, and slice integration tests across both the backend and frontend:
+
+### Backend Tests
+Execute all tests with:
+```bash
+cd backend
+mvn test
+```
+**Test Coverage Includes:**
+- `AuthServiceTest`: User registration, duplicate username/email rejection, login validation.
+- `JwtTokenProviderTest`: JJWT token creation, signature validation, expired token rejection.
+- `PostServiceTest`: Post creation, reply threading, strict owner authorization for edit and delete.
+- `LikeServiceTest`: Liking, unliking, and database constraint duplicate-like prevention.
+- `FollowServiceTest`: Following, unfollowing, self-follow prevention, duplicate follow prevention.
+- `FeedServiceTest`: Follower timeline fan-out aggregation and newest-first chronological sorting.
+- `AuthControllerTest`: MockMvc slice testing for HTTP payloads and standard validation error envelopes.
+- `GlobalExceptionHandlerTest`: Consistent error response schemas across 400, 401, 403, and 404 scenarios.
+
+### Frontend Tests & Typecheck
+Verify compilation and production build:
+```bash
+cd frontend
+npm run build
+```
+
+---
+
+## 🔒 Security Implementation
+
+1. **Password Protection**: BCrypt hashing with strong default salting rounds.
+2. **Stateless Authorization**: JWT Bearer tokens passed via standard `Authorization: Bearer <token>` HTTP header.
+3. **No Frontend Impersonation**: Never trusts client-sent user IDs for modification operations; user identity is derived strictly from `SecurityContextHolder.getContext().getAuthentication()`.
+4. **CORS Hardening**: Explicit CORS rules restricting origins, allowed headers, and methods.
+5. **No Committed Secrets**: Template `.env.example` provided; all secrets parameterized via system environment variables.
+
+---
+
+## 🔮 Known Limitations & Future Roadmap
+
+- **Media Uploads**: S3 / Cloudinary direct image upload integration.
+- **WebSocket STOMP Notifications**: Real-time push alerts for likes, replies, and mentions.
+- **Direct Messaging**: 1-on-1 private messaging channels.
+- **Bookmarks**: Bookmark tab for saving tweets locally.
+
+---
+
+## 👨‍💻 Author & Portfolio
+Crafted by **Yashwanth Kumar** as a software engineering portfolio project demonstrating modern Spring Boot 3, Java 21, and React architecture.
